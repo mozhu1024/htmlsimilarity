@@ -1,0 +1,995 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<title>Golang－ import 导入包的语法  - Go语言中文网 - Golang中文社区</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+	<meta charset="utf-8">
+	<link rel="shortcut icon" href="https://static.studygolang.com/img/favicon.ico">
+	<link rel="apple-touch-icon" type="image/png" href="https://static.studygolang.com/static/img/logo2.png">
+	<meta name="keywords" content="Go,Golang,Go语言">
+<meta name="description" content="转载自：http://blog.csdn.net/zhangzhebjut/article/details/25564457?utm_source=tuicool 一 包的导入语法 在写Go代码的时候经常用到import这个命令用来导入包文件，看到的方式参考如下： import( &#34;fmt&#34; ) 然后在代码里面可以通过如下的方式调用 fmt.Println(&#34;hello world&#34;) 上面这个f">
+	<meta name="author" content="polaris <polaris@studygolang.com>">
+	<link rel="canonical" href="https://studygolang.com/" />
+
+	<link rel="stylesheet" href="https://cdn.staticfile.org/bootswatch/3.2.0/css/cosmo/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://static.studygolang.com/static/dist/css/sg_libs.min.css?v=20180305"/>
+	<link rel="stylesheet" href="https://static.studygolang.com/static/dist/css/sg_styles.min.css?v=20190825"/>
+
+	
+<style>
+pre .line { margin: auto; line-height: 20px; border-bottom: none; }
+.image-package .image-container-fill { padding-bottom: 0 !important; }
+</style>
+
+
+
+<link href="https://cdn.staticfile.org/prism/9000.0.1/themes/prism-okaidia.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/prism/9000.0.1/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+
+
+
+
+	
+	<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+	
+</head>
+<body>
+	<header class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="container">
+			
+			<div class="navbar-header">
+				<a href="/" class="navbar-brand" title="Go语言中文网"><img alt="Go语言中文网" src="https://static.studygolang.com/img/logo1.png" style="margin-top: -7px; height: 45px;"></a>
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="navbar-main">
+				<ul class="nav navbar-nav">
+					<li class="">
+						<a href="/topics">主题</a>
+					</li>
+					<li class="active">
+						<a href="/articles">文章</a>
+					</li>
+					<li class="">
+						<a href="/projects">项目</a>
+					</li>
+					<li class="">
+						<a href="/resources">资源</a>
+					</li>
+					<li class="">
+						<a href="/books">图书</a>
+					</li>
+					<li>
+						<a href="/go/weekly">Go周刊<i class="newfuture"></i></a>
+					</li>
+					<li class="">
+						<a href="/dl">下载</a>
+					</li>
+					<li class="dropdown ">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#" id="docs">官方文档 <span class="caret"></span></a>
+						<ul class="dropdown-menu" aria-labelledby="docs">
+						
+							<li><a href="http://docs.studygolang.com" target="_blank">英文文档</a></li>
+							<li><a href="http://docscn.studygolang.com" target="_blank">中文文档</a></li>
+							<li><a href="/pkgdoc">标准库中文版</a></li>
+							<li role="presentation" class="divider"></li>
+							<li><a href="http://tour.studygolang.com" target="_blank">Go指南</a></li>
+						
+						</ul>
+					</li>
+				</ul>
+				<form class="navbar-form navbar-left" action="/search" role="search" target="_blank">
+					<input type="text" name="q" class="form-control search-query" placeholder="搜索" value="">
+				</form>
+				<ul class="nav navbar-nav navbar-right" id="userbar">
+					
+					<li class="first"><a href="/account/register">注册</a></li><li class="last"><a href="/account/login">登录</a></li>
+					
+				</ul>
+			</div>
+		</div>
+	</header>
+	<div class="wrapper" id="wrapper">
+		<div class="container" role="main">
+		
+
+			
+
+<div class="suspended-panel">
+    
+    <div badge="0"
+        class="like-btn panel-btn like-adjust  "></div>
+    <div badge="3"
+        class="comment-btn panel-btn comment-adjust with-badge"></div>
+    
+    <div class="collect-btn panel-btn "></div>
+    <div class="share-title">分享</div>
+    <div class="weibo-btn share-btn panel-btn"></div>
+    
+    <div class="wechat-btn share-btn panel-btn"></div>
+</div>
+
+<style type="text/css">
+.suspended-panel {
+	position: fixed;
+	top: 16rem;
+	margin-left: -6rem;
+}
+
+.panel-btn {
+    position: relative;
+    margin-bottom: .75rem;
+    width: 3rem;
+    height: 3rem;
+    background-color: #fff;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.04);
+    cursor: pointer
+}
+
+.panel-btn:not(.share-btn).active.with-badge:after {
+    background-color: #74ca46
+}
+
+.panel-btn.with-badge:after {
+    content: attr(badge);
+    position: absolute;
+    top: 0;
+    left: 75%;
+    padding: .1rem .4rem;
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1;
+    white-space: nowrap;
+    color: #fff;
+    background-color: #b2bac2;
+    border-radius: .7rem;
+    transform-origin: left top;
+    transform: scale(.75)
+}
+
+.panel-btn.like-btn {
+    background-image: url(https://static.studygolang.com/static/img/zan.svg)
+}
+
+.panel-btn.like-btn:hover {
+    background-image: url(https://static.studygolang.com/static/img/zan-hover.svg)
+}
+
+.panel-btn.like-btn.active {
+    background-image: url(https://static.studygolang.com/static/img/zan-active.svg)
+}
+
+.panel-btn.like-btn.like-adjust {
+    background-position: 53% 46%;
+}
+
+.panel-btn.comment-btn {
+    background-image: url(https://static.studygolang.com/static/img/comment.svg)
+}
+
+.panel-btn.comment-btn:hover {
+    background-image: url(https://static.studygolang.com/static/img/comment-hover.svg)
+}
+
+.panel-btn.comment-btn.comment-adjust {
+    background-position: 50% 55%
+}
+
+.panel-btn.collect-btn {
+    background-image: url(https://static.studygolang.com/static/img/collect.svg)
+}
+
+.panel-btn.collect-btn.active {
+    background-image: url(https://static.studygolang.com/static/img/collect-active.svg)
+}
+
+.panel-btn.collect-btn.open,.panel-btn.collect-btn:hover {
+    background-image: url(https://static.studygolang.com/static/img/collect-hover.svg)
+}
+
+.panel-btn.weibo-btn {
+    background-image: url(https://static.studygolang.com/static/img/weibo.svg)
+}
+
+.panel-btn.weibo-btn:hover {
+    background-image: url(https://static.studygolang.com/static/img/weibo-hover.svg)
+}
+
+.panel-btn.qq-btn {
+    background-image: url(https://static.studygolang.com/static/img/qq.svg)
+}
+
+.panel-btn.qq-btn:hover {
+    background-image: url(https://static.studygolang.com/static/img/qq-hover.svg)
+}
+
+.panel-btn.wechat-btn {
+    background-image: url(https://static.studygolang.com/static/img/wechat.svg)
+}
+
+.panel-btn.wechat-btn:hover {
+    background-image: url(https://static.studygolang.com/static/img/wechat-hover.svg)
+}
+
+.panel-btn.wechat-btn:hover .wechat-qr-code-img {
+    display: block
+}
+
+.share-title {
+    margin: 2.5rem 0 1rem;
+    font-size: 1rem;
+    text-align: center;
+    color: #c6c6c6;
+    user-select: none
+}
+
+.wechat-btn img {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 8rem;
+    height: 8rem;
+    margin-top: 1rem;
+    border: .5rem solid #fff;
+    transform: translateX(-50%);
+}
+</style>
+
+
+<div class="row">
+	<div class="col-md-9 col-sm-6">
+		<div class="sep20"></div>
+		<ol class="breadcrumb">
+			<li><a href="/">首页</a></li>
+			<li><a href="/articles">文章</a></li>
+		</ol>
+		<div class="page">
+			<div class="box_white" style="overflow: visible;">
+				<div class="title">
+					
+					<h1 id="title" data-id="4580">
+						Golang－ import 导入包的语法
+					</h1>
+					<small class="c9">
+					
+						
+						<span>code-review</span>
+						
+					
+						 · <span title="2015-07-30 03:00:00" class="timeago"></span> · 27074 次点击 ·
+						<span class="read-time"></span> ·
+						<span class="timeago" title="2019-10-24 12:42:18"></span> 开始浏览 &nbsp; &nbsp;
+					
+					</small>
+				</div>
+				
+				<div class="outdated">这是一个创建于 <span title="2015-07-30 03:00:00" class="timeago"></span> 的文章，其中的信息可能已经有所发展或是发生改变。</div>
+				
+				<div class="cell">
+					
+					<div id="myeditor" class="content article-entry">
+						<p>转载自：http://blog.csdn.net/zhangzhebjut/article/details/25564457?utm_source=tuicool</p>
+<div style="font-family: Tahoma; margin: 0px; padding: 0px; border: 0px; line-height: 1.428571em; font-size: 19px;"><span style="color: #333333; line-height: 1.428571em;"><span style="line-height: 28px;"><span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;"><strong>一 包的导入语法</strong></span></span></span></span></div>
+<div style="font-family: Tahoma; margin: 0px; padding: 0px; border: 0px; line-height: 19.9999942779541px; font-size: 19px;"><span style="line-height: 28px; color: #333333; letter-spacing: 0.5px;"><span style="font-family: 华文仿宋;">     在写Go代码的时候经常用到import这个命令用来导入包文件，看到的方式参考如下：</span></span></div>
+<div style="font-family: Tahoma; margin: 0px; padding: 0px; border: 0px; line-height: 19.9999942779541px; font-size: 19px;">      <span style="font-family: 华文仿宋;">import(<br/>
+         &#34;fmt&#34;<br/>
+     )</span></div>
+<div style="line-height: 19.9999942779541px; font-size: 19px;"><span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;">    然后在代码里面可以通过如下的方式调用</span></span></div>
+<div style="line-height: 19.9999942779541px; font-size: 19px;"><span style="font-family: 华文仿宋;">      fmt.Println(&#34;hello world&#34;)</span></div>
+<div><span style="line-height: 20px;">   </span></div>
+<div><span style="font-family: 华文仿宋; line-height: 1.428571em; font-size: 19px;">       上面这个fmt是Go语言的标准库，他其实是去GOROOT下去加载该模块，当然Go的import还支持如下两种方式来加载自己写的模块：</span></div>
+<div style="margin: 0px; padding: 0px; border: 0px; line-height: 1.428571em; font-size: 19px;">
+<span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;">      <strong>相对路径</strong>     <span style="line-height: 1.428571em; letter-spacing: 0.5px;">import   &#34;./model&#34;  //当前文件同一目录的model目录，但是不建议这种方式import</span></span></span></div>
+<div style="margin: 0px; padding: 0px; border: 0px; line-height: 1.428571em; font-size: 19px;">
+<span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;"><span style="line-height: 1.428571em; letter-spacing: 0.5px;">      <span style="line-height: 28px; color: #333333; letter-spacing: 0.5px;"><strong>绝对路径</strong>    <span style="line-height: 28px; color: #333333; letter-spacing: 0.5px;">import
+   &#34;shorturl/model&#34;  //加载GOPATH/src/shorturl/model模块</span></span></span></span></span></div>
+<div><br/>
+</div>
+<div style="font-size: 19px;"><span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;">     上面展示了一些import常用的几种方式，但是还有一些特殊的import，让很多新手很费解，下面是三种导入包的使用方法。</span></span></div>
+<p>
+
+<span style="font-family: 华文仿宋;"><br style="font-size: 19px;"/>
+<span style="font-size: 19px;">      1. <strong>点操作</strong>   有时候会看到如下的方式导入包     import( . “fmt” ) <br style="font-size: 19px;"/>
+<span style="font-size: 19px;">这个点操作的含义就是这个包导入之后在你调用这个包的函数时，你可以省略前缀的包名，也就是前面你调用的fmt.Println(“hello world”)  可以省略的写成Println(“hello world”)<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">      2. <strong>别名操作</strong>   别名操作顾名思义可以把包命名成另一个用起来容易记忆的名字<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">           import( f “fmt” )   别名操作调用包函数时前缀变成了重命名的前缀，即f.Println(“hello world”)<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">      3.  <strong>_操作</strong>   这个操作经常是让很多人费解的一个操作符，请看下面这个import<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">          import ( “database/sql” _ “github.com/ziutek/mymysql/godrv” ) <br style="font-size: 19px;"/>
+<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">        
+_操作其实只是引入该包。当导入一个包时，它所有的init()函数就会被执行，但有些时候并非真的需要使用这些包，仅仅是希望它的init()函数被执
+行而已。这个时候就可以使用_操作引用该包了。即使用_操作引用包是无法通过包名来调用包中的导出函数，而是只是为了简单的调用其init函数()。</span></span></span></span></span></span></span></span></p>
+<p> </p>
+					</div>
+					
+
+					
+					<div class="row orig-info">
+						<p>本文来自：<a href="/wr?u=http://www.cnblogs.com" target="_blank" title="博客园">博客园</a></p>
+						<p>感谢作者：code-review</p>
+						<p>查看原文：<a href="/wr?u=http%3a%2f%2fwww.cnblogs.com%2fcode-review%2farticles%2f4686491.html" target="_blank" title="Golang－ import 导入包的语法">Golang－ import 导入包的语法</a></p>
+					</div>
+					
+				</div>
+
+				
+				<div class="cell qrcode" style="position: relative;">
+    <p>入群交流（和以上内容无关）：Go中文网 QQ 交流群：798786647 或加微信入微信群：274768166  备注：入群；关注公众号：<a href="javascript:void(0)" title="" target="_self">Go语言中文网<img width="16" src="https://weixin.sogou.com/new/pc/images/ico_ewm.png"></a></p>
+    <span style="display: none;" class="qrcode-pop">
+        关注Go语言中文网<br>
+        <img src="https://static.studygolang.com/static/img/wx_sg_qrcode.jpg?imageView2/2/w/280" alt="关注微信" class="img-responsive center-block">
+        <span style="color: red;">领全套学习资料</span>
+    </span>
+</div>
+
+<style type="text/css">
+.qrcode-pop {
+    background: #fff;
+    border: 1px solid #ddd;
+    position: absolute;
+    left: 42%;
+    top: 32px;
+    -moz-box-shadow: 0 2px 5px #ddd;
+    -webkit-box-shadow: 0 2px 5px #d9d9d9;
+    box-shadow: 0 2px 5px #d9d9d9;
+    border-radius: 2px;
+	text-align: center;
+    padding: 5px 10px 16px;
+    line-height: 32px;
+    width: 150px;
+    z-index: 999;
+}
+</style>
+
+
+				<div class="content-buttons">
+					<div class="pull-right c9 f11" style="line-height: 12px; padding-top: 3px; text-shadow: 0px 1px 0px #fff;">27074 次点击 &nbsp;</div>
+					<a class="tb collect" href="javascript:;" title="加入收藏" data-objid="4580" data-objtype="1" data-collect="">加入收藏</a>
+					<a href="javascript:" class="tb weibo-btn">微博</a>
+					<div id="content-thank">
+						<a class="tb" href="javascript:;" title="赞" data-objid="4580" data-objtype="1" data-flag="">赞</a>
+					</div>
+				</div>
+			</div>
+			
+
+			<div class="sep20"></div>
+			<div class="box_white">
+				<div class="cell subject">
+					
+					<div class="item-list">
+					
+						<a class="add-collection" href="javascript:"><i class="fa fa-plus"></i> 收入我的专栏</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="sep20"></div>
+			<div class="box_white">
+				<div class="cell row">
+					
+					<div class="col-sm-6">上一篇：<a href="/articles/4579">golang中使用mongodb的操作类以及如何封装</a></div>
+					
+					
+					<div class="col-sm-6 right">下一篇：<a href="/articles/4581">IntelliJ Idea 14 安装 Golang 插件 google-go-lang-idea-</a></div>
+					
+				</div>
+			</div>
+
+			<div class="sep20"></div>
+
+			
+			<div id="replies" class="box_white">
+				<div class="cell">
+					<div class="pull-right" style="margin: -3px -5px 0px 0px;">
+					
+						
+						
+						<a href="/tag/%e5%87%bd%e6%95%b0" class="tag"><li class="fa fa-tag"></li> 函数</a>
+						
+						<a href="/tag/%e4%bb%a3%e7%a0%81" class="tag"><li class="fa fa-tag"></li> 代码</a>
+						
+						<a href="/tag/http" class="tag"><li class="fa fa-tag"></li> http</a>
+						
+						<a href="/tag/github" class="tag"><li class="fa fa-tag"></li> github</a>
+						
+					
+					</div>
+					
+						<span class="c9"><span class="cmtnum">3</span> 回复 &nbsp;<strong class="snow">|</strong> &nbsp;直到 2018-03-29 14:55:04</span>
+					
+				</div>
+				
+
+
+
+
+
+
+				<div class="comment-list cell" data-objid="4580" data-objtype="1" >
+					<div class="words hide"><div class="text-center">暂无回复</div></div>
+				</div>
+				
+
+
+
+
+
+
+			</div>
+
+			
+			
+			
+<div class="sep10"></div>
+<div class="box_white page-comment">
+	<input type="hidden" name="me-uid" value="0"/>
+	<div class="cell">添加一条新回复
+	
+	<span class="h2-tip">
+	（您需要 <a class="c-log" href="javascript:openPop('#login-pop');">登录</a> 后才能回复 <a href="/user/register" class="c-reg"> 没有账号</a> ？）</span>
+	
+	</div>
+	<div class="cell">
+		<div class="row clearfix md-toolbar">
+			<ul class="col-md-10 list-inline comment-tab-menu" data-comment-group="default">
+				<li class="comment-edit-tab cur"><a href="#" class="op">编辑</a></li>
+				<li class="comment-preview-tab"><a href="#" class="op">预览</a></li>
+				<li>
+					<div class="nav reply-to dn" data-floor="" data-username="">
+						<i class="fa fa-mail-reply" title=""></i>
+						<a href="#reply" class="user" title=""></a>
+						<a href="#" class="close"><i class="fa fa-close"></i></a>
+					</div>
+				</li>
+			</ul>
+			<div class="col-md-2 text-right">
+				<i id="upload-img" class="glyphicon glyphicon-picture upload-img tool-tip" data-toggle="tooltip" data-placement="top" title="上传图片"></i>
+			</div>
+		</div>
+		<div class="submit" id="commentForm">
+			<div class="comment-content-text" data-comment-group="default">
+				<textarea id="comment-content" name="content" class="comment-textarea main-textarea need-autogrow" rows="8"></textarea>
+			</div>
+			<div class="comment-content-preview cell" data-comment-group="default"></div>
+			<div class="sub row">
+				<ul class="help-block col-md-10">
+					<li>请尽量让自己的回复能够对别人有帮助</li>
+					<li class="markdown_tip">支持 Markdown 格式, <strong>**粗体**</strong>、~~删除线~~、<code>`单行代码`</code></li>
+					<li>支持 @ 本站用户；支持表情（输入 : 提示），见 <a href="http://www.emoji-cheat-sheet.com/" target="_blank">Emoji cheat sheet</a></li>
+					<li>图片支持拖拽、截图粘贴等方式上传</li>
+				</ul>
+				<div class="col-md-2 text-right"><button id="comment-submit" type="submit" title="提交" class="btn btn-default">提交</button></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/x-jsrender" id="one-comment">
+<div class="reply [%if is_new%]light[%/if%]" id="reply-[%:comment.floor%]">
+	<div data-floor="[%:comment.floor%]">
+		<div class="avatar"><a title="[%:user.username%]" href="/user/[%:user.username%]"><img class="media-object avatar-48" src="[%:user.avatar%]" alt="[%:user.username%]"></a></div>
+			<div class="infos">
+				<div class="info">
+					<span class="name">
+						<a class="user-name" data-name="[%:user.name%]" href="/user/[%:user.username%]">[%:user.username%]</a>
+					</span> ·
+					<span class="floor">#[%:comment.floor%]</span> ·
+					<abbr class="timeago" title="[%:comment.ctime%]">[%:comment.cmt_time%]</abbr>
+					<span class="opts pull-right">
+						<span class="op-reply hideable">
+							[%if me.uid == user.uid %]
+								<a data-floor="[%:comment.floor%]" title="编辑" class="btn-edit glyphicon glyphicon-edit"></a>
+							[%/if%]
+						  <a data-floor="[%:comment.floor%]" data-username="[%:user.username%]" title="回复此楼" class="btn-reply fa fa-mail-reply" href="#"></a>
+						</span>
+						
+					</span>
+				</div>
+				[%if comment.reply_floor > 0%]
+				<div class="reply-to-block">
+					<div class="info reply_user">
+						对
+						<a data-remote="true" href="/user/[%:comment.reply_user.username%]">
+							<img class="media-object avatar-16" src="[%:comment.reply_user.avatar%]" alt="[%:comment.reply_user.username%]"><span class="user-name">[%:comment.reply_user.username%]</span>
+						</a>
+						<a href="#reply-[%:comment.reply_floor%]"><span class="reply-floor">#[%:comment.reply_floor%]</span></a> 回复
+					</div>
+					<div class="markdown dn">
+						<p>[%:comment.reply_content%]</p>
+					</div>
+				</div>
+				[%/if%]
+
+			<div class="markdown" data-floor="[%:comment.floor%]">
+				<div class="content">[%:comment.content%]</div>
+				<div class="edit-wrapper">
+					<div class="row clearfix md-toolbar">
+						<ul class="col-md-10 list-inline comment-tab-menu" data-comment-group="[%:comment.floor%]">
+								<li class="comment-edit-tab cur"><a href="#" class="op">编辑</a></li>
+								<li class="comment-preview-tab"><a href="#" class="op">预览</a></li>
+						</ul>
+						<div class="col-md-2 text-right">
+							<i data-floor="[%:comment.floor%]" class="glyphicon glyphicon-picture upload-img tool-tip" data-toggle="tooltip" data-placement="top" title="上传图片"></i>
+						</div>
+					</div>
+					<div class="comment-content-text" data-comment-group="[%:comment.floor%]">
+						<textarea data-raw-content="[%:comment.rawContent%]" name="content" class="comment-textarea" rows="8" style="width: 100%;">[%:comment.rawContent%]</textarea>
+					</div>
+					<div class="comment-content-preview cell" data-comment-group="[%:comment.floor%]"></div>
+					<div class="text-right">
+						<button type="submit" title="提交" data-cid="[%:comment.cid%]" data-floor="[%:comment.floor%]" class="submit btn btn-default">提交</button>
+						<button title="取消" data-floor="[%:comment.floor%]" class="cancel btn btn-default">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</script>
+
+			
+
+			
+
+
+		</div>
+	</div>
+	<div class="col-md-3 col-sm-6">
+		<div class="sep20"></div>
+		<div class="box_white sidebar">
+	
+	<div class="top">
+		<h3 class="title"><i class="glyphicon glyphicon-user"></i> 用户登录</h3>
+	</div>
+	<div class="sb-content inner_content" style="padding-bottom: 0;">
+		<form action="/account/login" method="post" class="form-horizontal login" role="form" style="padding-top: 0; padding-bottom: 0;">
+			<div class="form-group">
+				<div class="col-sm-10">
+					<input type="text" class="form-control input-sm" id="username" name="username" placeholder="请填写用户名或邮箱">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-10">
+					<input type="password" class="form-control input-sm" id="passwd" name="passwd" placeholder="请填写密码">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-10">
+					<div class="checkbox">
+						<label>
+							<input id="user_remember_me" name="remember_me" type="checkbox" value="1" checked="checked" />	记住登录状态
+						</label>
+						<input class="btn btn-default btn-sm" data-disable-with="正在登录" name="commit" type="submit" value="登录" />
+					</div>
+					<div class="sep10"></div>
+					<a href="/oauth/github/login" class="btn btn-default btn-sm">
+						<i class="fa fa-github" aria-hidden="true"></i>
+						GitHub 登录
+					</a>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+</div>
+
+
+
+
+
+
+		
+		<div class="box_white sidebar" id="ad-right1">
+			
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-format="autorelaxed"
+     data-ad-client="ca-pub-4512014793067058"
+     data-ad-slot="4230018468"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+			
+		</div>
+		
+
+		<div class="box_white sidebar">
+	<div class="top">
+		<h3 class="title"><i class="glyphicon glyphicon-stats"></i>&nbsp;今日阅读排行</h3>
+	</div>
+	<div class="sb-content">
+		<div class="rank-list" data-objtype="1" data-limit="10" data-rank_type="today">
+			<ul class="list-unstyled">
+				<img src="/static/img/loaders/loader7.gif" alt="加载中" />
+			</ul>
+		</div>
+	</div>
+</div>
+
+		
+		<div class="box_white sidebar" id="ad-right2">
+			
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- 侧边栏自适应 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;min-width:270px;max-width:970px;width:100%;height:290px"
+     data-ad-client="ca-pub-4512014793067058"
+     data-ad-slot="3487838313"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+			
+		</div>
+		
+
+		<div class="box_white sidebar">
+	<div class="top">
+		<h3 class="title"><i class="glyphicon glyphicon-stats"></i>&nbsp;一周阅读排行</h3>
+	</div>
+	<div class="sb-content">
+		<div class="rank-list" data-objtype="1" data-limit="10" data-rank_type="week">
+			<ul class="list-unstyled">
+				<img src="/static/img/loaders/loader7.gif" alt="加载中" />
+			</ul>
+		</div>
+	</div>
+</div>
+
+		<div class="box_white sidebar">
+    <div class="top">
+        <h3 class="title"><i class="glyphicon glyphicon-qrcode"></i>&nbsp;&nbsp;关注我</h3>
+    </div>
+    <div class="sb-content">
+        <div>
+            <ul class="list-unstyled">
+                <li class="text-center">
+                    扫码关注<span style="color: red;">领全套学习资料</span>
+                    <img src="https://static.studygolang.com/static/img/wx_sg_qrcode.jpg?imageView2/2/w/280" alt="关注微信" class="img-responsive center-block">
+                </li>
+                <li class="text-center">
+                    加入 QQ 群：
+                    <ul class="list-unstyled">
+                        <li>192706294（已满）</li>
+                        <li>731990104</li>
+                        <li>798786647（已满）</li>
+                    </ul>
+                    <br>
+                </li>
+                <li class="text-center">
+                    加入微信群：274768166 ，备注入群
+                </li>
+                <li class="text-center">也欢迎加入知识星球 <a href="https://t.zsxq.com/r7AUN3B" target="_blank">Go粉丝们（免费）</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+	</div>
+</div>
+
+<link rel="stylesheet" href="https://static.studygolang.com/static/dist/css/modal.min.css">
+<div class="modal contribute-modal animated" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close">×</button>
+                <h4 class="modal-title">
+                    给该专栏投稿
+                    <a href="/articles/new" class="new-note-btn">写篇新文章</a>
+                </h4>
+                <span class="notice">每篇文章有总共有 5 次投稿机会</span>
+                <div>
+                    <input type="text" placeholder="搜索我的文章" class="search-input">
+                    <a class="search-btn">
+                        <i class="fa fa-search" aria-hidden="true" style="margin: 8px -1px 0 0;display: block;"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="modal-body">
+                <ul id="contribute-note-list"></ul>
+                <div class="modal-notes-placeholder" style="display: none;">
+                    <div class="text"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal animated add-self" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" data-dismiss="modal" class="close">×</button>
+                <h4 class="modal-title">收入到我管理的专栏
+                    <span class="new-collection-btn"><a href="/subject/new" target="_blank">新建专栏</a></span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="search">
+                    <input type="search" name="search-self" placeholder="搜索我管理的专栏">
+                    <a class="search-btn">
+                        <i class="fa fa-search" aria-hidden="true" style="margin: 6px 1px 0 0;display: block;"></i>
+                    </a>
+                </div>
+                <ul id="self-note-list"></ul>
+                <div class="modal-collections-placeholder" style="display: none;">
+                    <div class="avatar"></div>
+                    <div class="wrap">
+                        <div class="btn"></div>
+                        <div class="name"></div>
+                        <div class="text"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+
+<template id="content_tpl">
+<p>转载自：http://blog.csdn.net/zhangzhebjut/article/details/25564457?utm_source=tuicool</p>
+<div style="font-family: Tahoma; margin: 0px; padding: 0px; border: 0px; line-height: 1.428571em; font-size: 19px;"><span style="color: #333333; line-height: 1.428571em;"><span style="line-height: 28px;"><span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;"><strong>一 包的导入语法</strong></span></span></span></span></div>
+<div style="font-family: Tahoma; margin: 0px; padding: 0px; border: 0px; line-height: 19.9999942779541px; font-size: 19px;"><span style="line-height: 28px; color: #333333; letter-spacing: 0.5px;"><span style="font-family: 华文仿宋;">     在写Go代码的时候经常用到import这个命令用来导入包文件，看到的方式参考如下：</span></span></div>
+<div style="font-family: Tahoma; margin: 0px; padding: 0px; border: 0px; line-height: 19.9999942779541px; font-size: 19px;">      <span style="font-family: 华文仿宋;">import(<br/>
+         &#34;fmt&#34;<br/>
+     )</span></div>
+<div style="line-height: 19.9999942779541px; font-size: 19px;"><span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;">    然后在代码里面可以通过如下的方式调用</span></span></div>
+<div style="line-height: 19.9999942779541px; font-size: 19px;"><span style="font-family: 华文仿宋;">      fmt.Println(&#34;hello world&#34;)</span></div>
+<div><span style="line-height: 20px;">   </span></div>
+<div><span style="font-family: 华文仿宋; line-height: 1.428571em; font-size: 19px;">       上面这个fmt是Go语言的标准库，他其实是去GOROOT下去加载该模块，当然Go的import还支持如下两种方式来加载自己写的模块：</span></div>
+<div style="margin: 0px; padding: 0px; border: 0px; line-height: 1.428571em; font-size: 19px;">
+<span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;">      <strong>相对路径</strong>     <span style="line-height: 1.428571em; letter-spacing: 0.5px;">import   &#34;./model&#34;  //当前文件同一目录的model目录，但是不建议这种方式import</span></span></span></div>
+<div style="margin: 0px; padding: 0px; border: 0px; line-height: 1.428571em; font-size: 19px;">
+<span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;"><span style="line-height: 1.428571em; letter-spacing: 0.5px;">      <span style="line-height: 28px; color: #333333; letter-spacing: 0.5px;"><strong>绝对路径</strong>    <span style="line-height: 28px; color: #333333; letter-spacing: 0.5px;">import
+   &#34;shorturl/model&#34;  //加载GOPATH/src/shorturl/model模块</span></span></span></span></span></div>
+<div><br/>
+</div>
+<div style="font-size: 19px;"><span style="line-height: 1.428571em;"><span style="font-family: 华文仿宋;">     上面展示了一些import常用的几种方式，但是还有一些特殊的import，让很多新手很费解，下面是三种导入包的使用方法。</span></span></div>
+<p>
+
+<span style="font-family: 华文仿宋;"><br style="font-size: 19px;"/>
+<span style="font-size: 19px;">      1. <strong>点操作</strong>   有时候会看到如下的方式导入包     import( . “fmt” ) <br style="font-size: 19px;"/>
+<span style="font-size: 19px;">这个点操作的含义就是这个包导入之后在你调用这个包的函数时，你可以省略前缀的包名，也就是前面你调用的fmt.Println(“hello world”)  可以省略的写成Println(“hello world”)<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">      2. <strong>别名操作</strong>   别名操作顾名思义可以把包命名成另一个用起来容易记忆的名字<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">           import( f “fmt” )   别名操作调用包函数时前缀变成了重命名的前缀，即f.Println(“hello world”)<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">      3.  <strong>_操作</strong>   这个操作经常是让很多人费解的一个操作符，请看下面这个import<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">          import ( “database/sql” _ “github.com/ziutek/mymysql/godrv” ) <br style="font-size: 19px;"/>
+<br style="font-size: 19px;"/>
+<span style="font-size: 19px;">        
+_操作其实只是引入该包。当导入一个包时，它所有的init()函数就会被执行，但有些时候并非真的需要使用这些包，仅仅是希望它的init()函数被执
+行而已。这个时候就可以使用_操作引用该包了。即使用_操作引用包是无法通过包名来调用包中的导出函数，而是只是为了简单的调用其init函数()。</span></span></span></span></span></span></span></span></p>
+<p> </p>
+</template>
+
+
+
+		</div>
+	</div>
+	<div class="sep10"></div>
+	<footer id="bottom">
+		<div class="container nav-content">
+			<div class="inner_content">
+				<div class="sep10"></div>
+				<strong>
+					
+					<a href="/wiki/about" class="dark">关于</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<a href="/wiki/faq" class="dark">FAQ</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<a href="/wiki/contributors" class="dark">贡献者</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<a href="/readings" class="dark">晨读</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<a href="https://github.com/studygolang" class="dark">Github</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<a href="http://weibo.com/studygolang" class="dark">新浪微博</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<a href="https://play.studygolang.com" class="dark">Play</a> &nbsp; <span class="snow">•</span> &nbsp;
+					
+					<span id="onlineusers">2430</span> 人在线
+				</strong>
+				&nbsp;<span class="cc">最高记录 <span id="maxonline">4314</span></span>
+				<div class="sep20"></div>
+				&copy;2013-2019 studygolang.com Go语言中文网，中国 Golang 社区，致力于构建完善的 Golang 中文社区，Go语言爱好者的学习家园。
+				<div class="sep5"></div>
+				Powered by <a href="https://github.com/studygolang/studygolang">StudyGolang(Golang + MySQL)</a> &nbsp;<span class="snow">•</span>&nbsp;<span class="snow">·</span>&nbsp;CDN 采用 <a href="https://portal.qiniu.com/signup?code=3lfz4at7pxfma" title="七牛云" class="dark" target="_blank">七牛云</a>
+				<div class="sep20"></div>
+				<span class="small cc">VERSION: V4.0.0&nbsp;<span class="snow">·</span>&nbsp;8.888985ms&nbsp;<span class="snow">·</span>&nbsp;<strong>为了更好的体验，本站推荐使用 Chrome 或 Firefox 浏览器</strong></span>
+				<div class="sep20"></div>
+				<span class="f12 c9"><a href="http://www.miibeian.gov.cn/" target="_blank" rel="nofollow">京ICP备14030343号-1</a></span>
+				<div class="sep10"></div>
+			</div>
+		</div>
+	</footer>
+
+	<div id="gotop"></div>
+
+	
+	<input type="hidden" id="is_login_status" value="0" />
+	<div class="pop login-pop" id="login-pop">
+		<div style="position: relative;"><span class="close" style="position: absolute; right: -15px; top: -15px; cursor: pointer; color: #000; font-size: 13px;">X</span></div>
+		<div class="login-form">
+			<div class="error text-center"></div>
+			<div class="text-center" style="margin-bottom: 5px;">登录和大家一起探讨吧</div>
+			<form action="#" method="post" class="form-horizontal" role="form">
+				<div class="form-group">
+					<label for="username" class="col-sm-3 control-label">用户名</label>
+					<div class="col-sm-9 form-input">
+						<input type="text" class="form-control" id="form_username" name="username" placeholder="请填写用户名或邮箱">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="passwd" class="col-sm-3 control-label">密码</label>
+					<div class="col-sm-9 form-input">
+						<input type="password" class="form-control" id="form_passwd" name="passwd" placeholder="密码">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<div class="checkbox">
+							<label>
+								<input id="user_remember_me" name="remember_me" type="checkbox" value="1" checked="checked" />	记住登录状态
+							</label>
+							<button type="submit" id="login-btn" class="btn btn-default btn-sm">登录</button>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<a id="login-github" href="/oauth/github/login" class="btn btn-default btn-sm pull-left">
+							<i class="fa fa-github" aria-hidden="true"></i>
+							GitHub 登录
+						</a>
+						<div class="forget">
+							<a href="/account/forgetpwd" title="点击找回密码">忘记密码？</a>
+						</div>
+						<div class="register">
+							<span>还不是会员</span><a href="/account/register">现在注册</a>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div id="sg-overlay"></div>
+	
+
+	<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdn.staticfile.org/jquery-timeago/1.6.1/jquery.timeago.min.js"></script>
+	<script src="https://cdn.staticfile.org/zoom.js/0.0.1/zoom.min.js"></script>
+	<script src="https://cdn.staticfile.org/marked/0.3.6/marked.min.js"></script>
+	<script src="https://cdn.staticfile.org/Caret.js/0.3.1/jquery.caret.min.js"></script>
+	<script src="https://cdn.staticfile.org/emojify.js/1.1.0/js/emojify.min.js"></script>
+
+	<script type="text/javascript">
+	var uid =  0 ;
+	var isHttps =  true ,
+		cdnDomain = "https:\/\/static.studygolang.com\/";
+	if (isHttps) {
+		var wsUrl = 'wss://studygolang.com/ws?uid='+uid;
+	} else {
+		var wsUrl = 'ws://studygolang.com/ws?uid='+uid;
+	}
+	var GLaunchTime =  1570415029 *1000;
+	</script>
+	<script src="https://cdn.staticfile.org/lscache/1.1.0/lscache.min.js"></script>
+	<script src="https://cdn.staticfile.org/jsrender/0.9.90/jsrender.min.js"></script>
+	<script src="https://cdn.staticfile.org/plupload/3.1.1/plupload.full.min.js"></script>
+	<script type="text/javascript">
+	$.views.settings.delimiters("[%", "%]");
+	
+	</script>
+
+	<script src="https://static.studygolang.com/static/dist/js/sg_libs.min.js?v=0.01"></script>
+	<script src="https://static.studygolang.com/static/dist/js/sg_base.min.js?v=0.03"></script>
+
+	
+
+<script type="text/javascript" src="https://static.studygolang.com/static/dist/js/articles.min.js"></script>
+
+<script type="text/javascript">
+
+SG.SIDE_BARS = [
+	"/rank/view",
+];
+
+var keyprefix = 'article';
+var objid =  4580 ;
+
+$(function(){
+	
+
+	
+	$('.need-autogrow').autoGrow();
+
+	
+	loadComments();
+	
+
+	
+	$('#wrapper .content').on('mousedown', 'a', function(evt){
+		var url = $(this).attr('href');
+		
+		$(this).attr('href', url);
+		$(this).attr('target', '_blank');
+	});
+
+	var len = '转载自：http:\/\/blog.csdn.net\/zhangzhebjut\/article\/details\/25564457?utm_source=tuicool 一 包的导入语法 在写Go代码的时候经常用到import这个命令用来导入包文件，看到的方式参考如下： import( \x22fmt\x22 ) 然后在代码里面可以通过如下的方式调用 fmt.Println(\x22hello world\x22) 上面这个fmt是Go语言的标准库，他其实是去GOROOT下去加载该模块，当然Go的import还支持如下两种方式来加载自己写的模块： 相对路径 import \x22.\/model\x22 \/\/当前文件同一目录的model目录，但是不建议这种方式import 绝对路径 import \x22shorturl\/model\x22 \/\/加载GOPATH\/src\/shorturl\/model模块 上面展示了一些import常用的几种方式，但是还有一些特殊的import，让很多新手很费解，下面是三种导入包的使用方法。 1. 点操作 有时候会看到如下的方式导入包 import( . “fmt” ) 这个点操作的含义就是这个包导入之后在你调用这个包的函数时，你可以省略前缀的包名，也就是前面你调用的fmt.Println(“hello world”) 可以省略的写成Println(“hello world”) 2. 别名操作 别名操作顾名思义可以把包命名成另一个用起来容易记忆的名字 import( f “fmt” ) 别名操作调用包函数时前缀变成了重命名的前缀，即f.Println(“hello world”) 3. _操作 这个操作经常是让很多人费解的一个操作符，请看下面这个import import ( “database\/sql” _ “github.com\/ziutek\/mymysql\/godrv” ) _操作其实只是引入该包。当导入一个包时，它所有的init()函数就会被执行，但有些时候并非真的需要使用这些包，仅仅是希望它的init()函数被执 行而已。这个时候就可以使用_操作引用该包了。即使用_操作引用包是无法通过包名来调用包中的导出函数，而是只是为了简单的调用其init函数()。'.length;
+	var readTime = Math.round(len / 900);
+	if (readTime >= 1) {
+		$('.read-time').text('预计阅读时间 '+readTime+' 分钟');
+	} else {
+		$('.read-time').text('预计阅读时间不到 1 分钟');
+	}
+
+	$('.weibo-btn').on('click', function(evt) {
+		evt.preventDefault();
+
+		window.open('http://service.weibo.com/share/share.php?url=https://studygolang.com/articles/4580&title='+encodeURIComponent('Go语言中文网 - Golang－ import 导入包的语法 by code-review #golang#'), '_blank', 'width=550,height=370');
+	});
+});
+</script>
+<script type="text/javascript" src="https://cdn.staticfile.org/ckeditor/4.6.2/ckeditor.js"></script>
+<script type="text/javascript" src="https://static.studygolang.com/static/ckeditor/config.js"></script>
+<script type="text/javascript" src="https://static.studygolang.com/static/ckeditor/article.js"></script>
+
+
+
+
+	<script type="text/javascript" src="https://static.studygolang.com/static/dist/js/sidebar.min.js"></script>
+
+	
+		
+		
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-4512014793067058",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-18275235-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?224c227cd9239761ec770bc8c1fb134c";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+	
+
+</body>
+</html>
